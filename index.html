@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>교무수첩 — 선생님을 위한 디지털 교무수첩</title>
+<meta name="description" content="학생 명단, 상담일지, 출결, 수행평가까지. 담임 업무에 필요한 모든 기록을 하나의 교무수첩에서 관리하세요.">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+  :root {
+    --bg: #ffffff;
+    --bg-soft: #f5f5f7;
+    --text: #1d1d1f;
+    --text-secondary: #6e6e73;
+    --accent: #0071e3;
+    --accent-hover: #0077ed;
+    --card-radius: 28px;
+    --max-width: 1080px;
+    --nav-height: 52px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, "SF Pro KR", "SF Pro Display", "Apple SD Gothic Neo", "Segoe UI", "Malgun Gothic", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    letter-spacing: -0.015em;
+    overflow-x: hidden;
+  }
+
+  ::selection { background: rgba(0, 113, 227, 0.18); }
+
+  /* ─── Nav ─── */
+  .nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: var(--nav-height);
+    z-index: 100;
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    background: rgba(255, 255, 255, 0.72);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    transition: background 0.3s ease;
+  }
+  .nav-inner {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 22px;
+  }
+  .nav-logo {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .nav-logo svg { width: 20px; height: 20px; }
+  .nav-links {
+    display: flex;
+    gap: 28px;
+    list-style: none;
+  }
+  .nav-links a {
+    font-size: 13px;
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+  .nav-links a:hover { color: var(--text); }
+  .nav-cta {
+    font-size: 13px;
+    font-weight: 500;
+    color: #fff !important;
+    background: var(--accent);
+    padding: 6px 16px;
+    border-radius: 980px;
+    transition: background 0.2s ease;
+  }
+  .nav-cta:hover { background: var(--accent-hover); color: #fff !important; }
+  @media (max-width: 720px) {
+    .nav-links li:not(:last-child) { display: none; }
+  }
+
+  /* ─── Hero ─── */
+  .hero {
+    padding: 150px 22px 90px;
+    text-align: center;
+    background: linear-gradient(180deg, #fbfbfd 0%, #ffffff 100%);
+  }
+  .hero-eyebrow {
+    display: inline-block;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--accent);
+    margin-bottom: 18px;
+    letter-spacing: 0.01em;
+  }
+  .hero h1 {
+    font-size: clamp(40px, 7vw, 72px);
+    font-weight: 800;
+    line-height: 1.08;
+    letter-spacing: -0.035em;
+    margin-bottom: 22px;
+  }
+  .hero h1 .gradient {
+    background: linear-gradient(90deg, #0071e3 0%, #34aadc 50%, #5856d6 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+  .hero p {
+    font-size: clamp(17px, 2.4vw, 22px);
+    line-height: 1.5;
+    color: var(--text-secondary);
+    max-width: 640px;
+    margin: 0 auto 36px;
+    font-weight: 400;
+  }
+  .hero-actions {
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 17px;
+    font-weight: 500;
+    padding: 13px 28px;
+    border-radius: 980px;
+    text-decoration: none;
+    transition: all 0.25s ease;
+  }
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+  }
+  .btn-primary:hover { background: var(--accent-hover); transform: scale(1.02); }
+  .btn-secondary {
+    color: var(--accent);
+    background: transparent;
+  }
+  .btn-secondary:hover { text-decoration: underline; }
+
+  /* ─── Hero mockup ─── */
+  .hero-visual {
+    max-width: 900px;
+    margin: 70px auto 0;
+    padding: 0 22px;
+  }
+  .mockup {
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.12), 0 4px 16px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+    text-align: left;
+    border: 1px solid rgba(0,0,0,0.05);
+  }
+  .mockup-bar {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 13px 18px;
+    background: #fafafa;
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+  }
+  .mockup-dot { width: 11px; height: 11px; border-radius: 50%; }
+  .mockup-dot:nth-child(1) { background: #ff5f57; }
+  .mockup-dot:nth-child(2) { background: #febc2e; }
+  .mockup-dot:nth-child(3) { background: #28c840; }
+  .mockup-body {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    min-height: 380px;
+  }
+  .mockup-sidebar {
+    background: #fbfbfd;
+    border-right: 1px solid rgba(0,0,0,0.06);
+    padding: 18px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .mockup-nav-item {
+    font-size: 13px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .mockup-nav-item.active {
+    background: rgba(0, 113, 227, 0.1);
+    color: var(--accent);
+    font-weight: 600;
+  }
+  .mockup-nav-item svg { width: 15px; height: 15px; flex-shrink: 0; }
+  .mockup-main { padding: 26px 30px; }
+  .mockup-title { font-size: 19px; font-weight: 700; margin-bottom: 4px; }
+  .mockup-sub { font-size: 12px; color: var(--text-secondary); margin-bottom: 20px; }
+  .mockup-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: var(--bg-soft);
+    margin-bottom: 8px;
+  }
+  .mockup-avatar {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; color: #fff;
+    flex-shrink: 0;
+  }
+  .mockup-row-name { font-size: 13px; font-weight: 600; }
+  .mockup-row-detail { font-size: 11px; color: var(--text-secondary); }
+  .mockup-tag {
+    margin-left: auto;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 980px;
+    flex-shrink: 0;
+  }
+  .tag-blue { background: rgba(0,113,227,0.12); color: #0071e3; }
+  .tag-green { background: rgba(52,199,89,0.14); color: #248a3d; }
+  .tag-orange { background: rgba(255,149,0,0.14); color: #c93400; }
+  @media (max-width: 720px) {
+    .mockup-body { grid-template-columns: 1fr; }
+    .mockup-sidebar { flex-direction: row; overflow-x: auto; border-right: none; border-bottom: 1px solid rgba(0,0,0,0.06); }
+    .mockup-nav-item { white-space: nowrap; }
+  }
+
+  /* ─── Sections ─── */
+  section { padding: 110px 22px; }
+  .section-inner { max-width: var(--max-width); margin: 0 auto; }
+  .section-header { text-align: center; margin-bottom: 64px; }
+  .section-eyebrow {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+  .section-header h2 {
+    font-size: clamp(30px, 4.5vw, 48px);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.12;
+    margin-bottom: 16px;
+  }
+  .section-header p {
+    font-size: clamp(16px, 2vw, 19px);
+    color: var(--text-secondary);
+    max-width: 560px;
+    margin: 0 auto;
+    line-height: 1.55;
+  }
+
+  /* ─── Bento grid ─── */
+  .bento {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 18px;
+  }
+  .card {
+    background: var(--bg-soft);
+    border-radius: var(--card-radius);
+    padding: 38px 34px;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.35s cubic-bezier(0.25, 0.1, 0.25, 1), box-shadow 0.35s ease;
+  }
+  .card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 44px rgba(0, 0, 0, 0.08);
+  }
+  .card-lg { grid-column: span 3; }
+  .card-md { grid-column: span 2; }
+  .card-full { grid-column: span 6; }
+  @media (max-width: 900px) {
+    .card-lg, .card-md { grid-column: span 3; }
+  }
+  @media (max-width: 640px) {
+    .card-lg, .card-md, .card-full { grid-column: span 6; }
+    .card { padding: 30px 26px; }
+  }
+  .card-icon {
+    width: 46px; height: 46px;
+    border-radius: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    flex-shrink: 0;
+  }
+  .card-icon svg { width: 23px; height: 23px; }
+  .card h3 {
+    font-size: 21px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 10px;
+  }
+  .card .lead {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.5;
+    margin-bottom: 8px;
+  }
+  .card p {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--text-secondary);
+  }
+  .icon-blue   { background: rgba(0,113,227,0.12);  color: #0071e3; }
+  .icon-green  { background: rgba(52,199,89,0.14);  color: #248a3d; }
+  .icon-orange { background: rgba(255,149,0,0.15);  color: #c93400; }
+  .icon-purple { background: rgba(88,86,214,0.13);  color: #5856d6; }
+  .icon-pink   { background: rgba(255,45,85,0.11);  color: #ff2d55; }
+  .icon-teal   { background: rgba(48,176,199,0.14); color: #0c7f99; }
+  .icon-indigo { background: rgba(94,92,230,0.13);  color: #5e5ce6; }
+  .icon-gray   { background: rgba(110,110,115,0.12); color: #48484a; }
+
+  /* ─── Dark section (학년도별 관리) ─── */
+  .dark-section {
+    background: #000;
+    color: #f5f5f7;
+    border-radius: 0;
+  }
+  .dark-section .section-eyebrow { color: #2997ff; }
+  .dark-section .section-header h2 { color: #f5f5f7; }
+  .dark-section .section-header p { color: #a1a1a6; }
+  .year-timeline {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    flex-wrap: wrap;
+    margin-top: 10px;
+  }
+  .year-chip {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 18px;
+    padding: 22px 30px;
+    text-align: center;
+    min-width: 150px;
+  }
+  .year-chip.current {
+    background: rgba(41,151,255,0.15);
+    border-color: rgba(41,151,255,0.5);
+  }
+  .year-chip .year { font-size: 22px; font-weight: 800; letter-spacing: -0.02em; }
+  .year-chip.current .year { color: #2997ff; }
+  .year-chip .label { font-size: 12px; color: #a1a1a6; margin-top: 4px; }
+  .year-arrow {
+    color: #48484a;
+    padding: 0 16px;
+    font-size: 20px;
+  }
+  .dark-note {
+    text-align: center;
+    color: #a1a1a6;
+    font-size: 15px;
+    line-height: 1.6;
+    max-width: 540px;
+    margin: 44px auto 0;
+  }
+  .dark-note strong { color: #f5f5f7; font-weight: 600; }
+
+  /* ─── Two-up feature (백업 / 꾸미기) ─── */
+  .two-up {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+  }
+  @media (max-width: 720px) { .two-up { grid-template-columns: 1fr; } }
+  .two-up .card { background: #fff; border: 1px solid rgba(0,0,0,0.07); }
+
+  .theme-swatches { display: flex; gap: 10px; margin-top: 22px; }
+  .swatch {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    border: 2px solid rgba(0,0,0,0.06);
+    transition: transform 0.2s ease;
+  }
+  .swatch:hover { transform: scale(1.12); }
+  .sw1 { background: linear-gradient(135deg, #0071e3, #34aadc); }
+  .sw2 { background: linear-gradient(135deg, #ff9500, #ff2d55); }
+  .sw3 { background: linear-gradient(135deg, #34c759, #30b0c7); }
+  .sw4 { background: linear-gradient(135deg, #5856d6, #af52de); }
+  .sw5 { background: linear-gradient(135deg, #1d1d1f, #6e6e73); }
+
+  .backup-visual {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-top: 22px;
+    color: var(--text-secondary);
+  }
+  .backup-node {
+    background: var(--bg-soft);
+    border-radius: 14px;
+    padding: 14px 18px;
+    font-size: 13px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text);
+  }
+  .backup-node svg { width: 17px; height: 17px; color: var(--accent); }
+  .backup-arrows { font-size: 16px; color: #c7c7cc; }
+
+  /* ─── CTA ─── */
+  .cta-section {
+    text-align: center;
+    background: var(--bg-soft);
+  }
+  .cta-section h2 {
+    font-size: clamp(30px, 4.5vw, 48px);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    margin-bottom: 16px;
+  }
+  .cta-section p {
+    font-size: 19px;
+    color: var(--text-secondary);
+    margin-bottom: 34px;
+  }
+
+  /* ─── Footer ─── */
+  footer {
+    padding: 36px 22px 48px;
+    border-top: 1px solid rgba(0,0,0,0.08);
+  }
+  .footer-inner {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+
+  /* ─── Reveal animation ─── */
+  .reveal {
+    opacity: 0;
+    transform: translateY(26px);
+    transition: opacity 0.7s cubic-bezier(0.25, 0.1, 0.25, 1), transform 0.7s cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+  @media (prefers-reduced-motion: reduce) {
+    .reveal { opacity: 1; transform: none; transition: none; }
+    html { scroll-behavior: auto; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Nav -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="#" class="nav-logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#0071e3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+      교무수첩
+    </a>
+    <ul class="nav-links">
+      <li><a href="#features">주요 기능</a></li>
+      <li><a href="#yearly">학년도별 관리</a></li>
+      <li><a href="#personalize">백업 · 꾸미기</a></li>
+      <li><a href="app.html" class="nav-cta">시작하기</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- Hero -->
+<header class="hero">
+  <span class="hero-eyebrow">선생님을 위한 디지털 교무수첩</span>
+  <h1>흩어져 있던 기록을,<br><span class="gradient">하나의 수첩으로.</span></h1>
+  <p>학생 명단부터 상담일지, 출결, 수행평가, 업무 일정까지.<br>담임 업무에 필요한 모든 기록을 한곳에서 관리하세요.</p>
+  <div class="hero-actions">
+    <a href="app.html" class="btn btn-primary">무료로 시작하기</a>
+    <a href="#features" class="btn btn-secondary">기능 살펴보기 ›</a>
+  </div>
+
+  <div class="hero-visual reveal">
+    <div class="mockup">
+      <div class="mockup-bar">
+        <span class="mockup-dot"></span><span class="mockup-dot"></span><span class="mockup-dot"></span>
+      </div>
+      <div class="mockup-body">
+        <div class="mockup-sidebar">
+          <div class="mockup-nav-item active">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            학생 명단
+          </div>
+          <div class="mockup-nav-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            상담일지
+          </div>
+          <div class="mockup-nav-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            출결 기록
+          </div>
+          <div class="mockup-nav-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            수행평가
+          </div>
+          <div class="mockup-nav-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+            업무 메모
+          </div>
+        </div>
+        <div class="mockup-main">
+          <div class="mockup-title">2학년 3반 학생 명단</div>
+          <div class="mockup-sub">28명 · 2026학년도 1학기</div>
+          <div class="mockup-row">
+            <div class="mockup-avatar" style="background:#0071e3;">김</div>
+            <div>
+              <div class="mockup-row-name">김서연</div>
+              <div class="mockup-row-detail">상담 2건 · 출결 이상 없음</div>
+            </div>
+            <span class="mockup-tag tag-blue">상담 예정</span>
+          </div>
+          <div class="mockup-row">
+            <div class="mockup-avatar" style="background:#34c759;">이</div>
+            <div>
+              <div class="mockup-row-name">이준호</div>
+              <div class="mockup-row-detail">수행평가 3/4 완료</div>
+            </div>
+            <span class="mockup-tag tag-green">완료</span>
+          </div>
+          <div class="mockup-row">
+            <div class="mockup-avatar" style="background:#ff9500;">박</div>
+            <div>
+              <div class="mockup-row-name">박지민</div>
+              <div class="mockup-row-detail">학부모 상담 기록 1건</div>
+            </div>
+            <span class="mockup-tag tag-orange">확인 필요</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- Features -->
+<section id="features">
+  <div class="section-inner">
+    <div class="section-header reveal">
+      <span class="section-eyebrow">주요 기능</span>
+      <h2>담임 업무의 모든 순간,<br>필요한 기능이 준비되어 있습니다.</h2>
+      <p>학생 등록부터 상담·출결·평가·인쇄까지, 교무수첩 하나면 충분합니다.</p>
+    </div>
+
+    <div class="bento">
+      <!-- 학생 명단 간편 등록 -->
+      <div class="card card-lg reveal">
+        <div class="card-icon icon-blue">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+        </div>
+        <h3>학생 명단 간편 등록</h3>
+        <p class="lead">학생 정보를 한 명씩 입력하지 않아도 됩니다.</p>
+        <p>엑셀 파일을 활용하여 학생 명단을 불러올 수 있으며, 학급별 학생 정보를 편리하게 관리할 수 있습니다.</p>
+      </div>
+
+      <!-- 학생 상담일지 -->
+      <div class="card card-lg reveal">
+        <div class="card-icon icon-green">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </div>
+        <h3>학생 상담일지</h3>
+        <p class="lead">학생과 상담한 날짜와 내용을 기록할 수 있습니다.</p>
+        <p>여러 곳에 흩어져 있던 상담 기록을 학생별로 확인할 수 있어 학생 지도와 상담 내용을 정리할 때 편리합니다.</p>
+      </div>
+
+      <!-- 학부모 상담 기록 -->
+      <div class="card card-md reveal">
+        <div class="card-icon icon-orange">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        </div>
+        <h3>학부모 상담 기록</h3>
+        <p class="lead">학부모와 상담한 날짜 및 상담 내용을 기록할 수 있습니다.</p>
+        <p>전화 상담이나 학교생활 관련 상담 내용을 필요할 때 다시 확인할 수 있습니다.</p>
+      </div>
+
+      <!-- 출결 및 학생 기록 -->
+      <div class="card card-md reveal">
+        <div class="card-icon icon-purple">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M9 16l2 2 4-4"/></svg>
+        </div>
+        <h3>출결 및 학생 기록</h3>
+        <p class="lead">학생의 출결과 학교생활 중 확인이 필요한 내용을 기록할 수 있습니다.</p>
+        <p>학생별 누적 기록을 확인할 수 있어 담임 업무에 활용하기 좋습니다.</p>
+      </div>
+
+      <!-- 수행평가 관리 -->
+      <div class="card card-md reveal">
+        <div class="card-icon icon-teal">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        </div>
+        <h3>수행평가 관리</h3>
+        <p class="lead">담당 학급과 학생을 등록하고 수행평가 진행 상황을 확인할 수 있습니다.</p>
+        <p>여러 학급을 담당하는 교과 교사도 학생별 평가 현황을 한눈에 관리할 수 있습니다.</p>
+      </div>
+
+      <!-- 학생별 기록 모아보기 -->
+      <div class="card card-lg reveal">
+        <div class="card-icon icon-pink">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="7" r="4"/><path d="M5.5 21a7.5 7.5 0 0 1 13 0"/><path d="M2 12h3M19 12h3" opacity="0.5"/></svg>
+        </div>
+        <h3>학생별 기록 모아보기</h3>
+        <p class="lead">학생 한 명을 선택하면 해당 학생의 상담·출결·학교생활 관련 기록을 모아 확인할 수 있습니다.</p>
+        <p>필요한 기록을 찾기 위해 여러 메뉴와 파일을 다시 열어보는 번거로움을 줄였습니다.</p>
+      </div>
+
+      <!-- 업무 메모 및 일정 관리 -->
+      <div class="card card-lg reveal">
+        <div class="card-icon icon-indigo">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+        </div>
+        <h3>업무 메모 및 일정 관리</h3>
+        <p class="lead">학교 업무, 제출 기한, 회의 일정 등 놓치기 쉬운 내용을 기록할 수 있습니다.</p>
+        <p>교무수첩과 업무 메모, 일정을 하나의 공간에서 관리해 보세요.</p>
+      </div>
+
+      <!-- 필요한 내용 선택 인쇄 -->
+      <div class="card card-lg reveal">
+        <div class="card-icon icon-gray">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        </div>
+        <h3>필요한 내용 선택 인쇄</h3>
+        <p class="lead">필요한 기록을 선택하여 확인하거나 인쇄할 수 있습니다.</p>
+        <p>상담 내용 정리와 업무 기록 확인 등 다양한 상황에 활용할 수 있습니다.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 학년도별 관리 (dark) -->
+<section id="yearly" class="dark-section">
+  <div class="section-inner">
+    <div class="section-header reveal">
+      <span class="section-eyebrow">학년도별 관리</span>
+      <h2>새 학년이 시작되어도,<br>기록은 계속됩니다.</h2>
+      <p>새 학년이 시작되면 새로운 학년도를 생성하여 사용할 수 있습니다. 이전 학년도 기록은 보관하고, 새로운 학생 명단과 학급을 등록하여 이어서 사용할 수 있습니다.</p>
+    </div>
+    <div class="year-timeline reveal">
+      <div class="year-chip">
+        <div class="year">2024</div>
+        <div class="label">기록 보관</div>
+      </div>
+      <span class="year-arrow">›</span>
+      <div class="year-chip">
+        <div class="year">2025</div>
+        <div class="label">기록 보관</div>
+      </div>
+      <span class="year-arrow">›</span>
+      <div class="year-chip current">
+        <div class="year">2026</div>
+        <div class="label">현재 학년도</div>
+      </div>
+    </div>
+    <p class="dark-note reveal">매년 새로운 교무수첩을 다시 구매하거나 새로운 양식을 만들 필요 없이 <strong>학년도별로 기록을 관리</strong>할 수 있습니다.</p>
+  </div>
+</section>
+
+<!-- 백업 & 꾸미기 -->
+<section id="personalize">
+  <div class="section-inner">
+    <div class="section-header reveal">
+      <span class="section-eyebrow">안심하고, 나답게</span>
+      <h2>소중한 기록은 안전하게,<br>수첩은 내 취향대로.</h2>
+    </div>
+    <div class="two-up">
+      <div class="card reveal">
+        <div class="card-icon icon-blue">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        </div>
+        <h3>백업 및 복원</h3>
+        <p class="lead">기록한 자료를 백업 파일로 저장할 수 있습니다.</p>
+        <p>컴퓨터 또는 브라우저를 변경하기 전 백업 파일을 저장하고, 필요한 경우 다시 복원하여 사용할 수 있습니다.</p>
+        <div class="backup-visual">
+          <div class="backup-node">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+            기존 컴퓨터
+          </div>
+          <span class="backup-arrows">⇄</span>
+          <div class="backup-node">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            백업 파일
+          </div>
+          <span class="backup-arrows">⇄</span>
+          <div class="backup-node">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+            새 컴퓨터
+          </div>
+        </div>
+      </div>
+      <div class="card reveal">
+        <div class="card-icon icon-pink">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/><circle cx="17.5" cy="10.5" r="1.5" fill="currentColor" stroke="none"/><circle cx="8.5" cy="7.5" r="1.5" fill="currentColor" stroke="none"/><circle cx="6.5" cy="12.5" r="1.5" fill="currentColor" stroke="none"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>
+        </div>
+        <h3>나만의 교무수첩 꾸미기</h3>
+        <p class="lead">기본 테마뿐 아니라 원하는 배경을 적용하여 나만의 교무수첩으로 꾸밀 수 있습니다.</p>
+        <p>매일 사용하는 교무수첩을 자신의 취향에 맞게 설정해 보세요.</p>
+        <div class="theme-swatches">
+          <div class="swatch sw1"></div>
+          <div class="swatch sw2"></div>
+          <div class="swatch sw3"></div>
+          <div class="swatch sw4"></div>
+          <div class="swatch sw5"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section id="start" class="cta-section">
+  <div class="section-inner reveal">
+    <h2>오늘부터, 새로운 교무수첩.</h2>
+    <p>복잡한 설치 없이 브라우저에서 바로 시작할 수 있습니다.</p>
+    <a href="app.html" class="btn btn-primary">무료로 시작하기</a>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <div class="footer-inner">
+    <span>© 2026 교무수첩. All rights reserved.</span>
+    <span>선생님의 하루를 더 가볍게.</span>
+  </div>
+</footer>
+
+<script>
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+  document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
+</script>
+
+</body>
+</html>
